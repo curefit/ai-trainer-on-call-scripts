@@ -1,4 +1,15 @@
-# ufs-backend-util
-Utility scripts for user-fitness-service
+# ai-trainer-on-call-scripts
+Utility scripts
 
-![Image of Yaktocat](images/ufs_db_complete_3_cols.png)
+## Clone
+- `git clone https://github.com/curefit/ai-trainer-on-call-scripts.git`
+
+## Change to project root
+- `cd ai-trainer-on-call-scripts`
+
+## Update master
+- `git pull`
+
+## Activate project python
+- `source venv/bin/activate`
+- Install dependencies after activating python using `pip install requests aiohttp`

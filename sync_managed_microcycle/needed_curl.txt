@@ -1,0 +1,7 @@
+curl --location --request PUT 'http://user-fitness-service.production.cure.fit.internal/sync/managed_microcycle_single_user' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "userId": 69131585,
+    "oldManagedMicrocycleId": 213,
+    "newManagedMicrocycleId": 946
+}'

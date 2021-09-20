@@ -1,0 +1,56 @@
+import csv
+import aiohttp
+import asyncio
+import time
+
+
+def get_user_ids(user_ids_filename):
+    with open(user_ids_filename) as f:
+        user_ids = list(csv.reader(f, delimiter=','))[1:]
+    return user_ids
+
+
+def get_plan_maps(plan_maps_filename):
+    with open(plan_maps_filename) as f:
+        plan_maps = list(csv.reader(f, delimiter=','))[1:]
+    return plan_maps
+
+
+async def sync_plan(session, userId, old_managed_micro_cycle_id, new_managed_micro_cycle_id):
+    url = "http://user-fitness-service.production.cure.fit.internal/sync/managed_microcycle_single_user"
+    request_body = {
+        'userId': userId,
+        'oldManagedMicrocycleId': old_managed_micro_cycle_id,
+        'newManagedMicrocycleId': new_managed_micro_cycle_id
+    }
+
+    async with session.put(url, request_body) as res:
+        status = await res.json()
+        return status
+
+
+async def sync_all_plans(user_ids_filename, plan_maps_filename):
+    user_ids = get_user_ids(user_ids_filename)
+    plan_maps = get_plan_maps(plan_maps_filename)
+
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for row_plan_maps in plan_maps:
+            old_managed_micro_cycle_id = row_plan_maps[0]
+            new_managed_micro_cycle_id = row_plan_maps[1]
+
+            for row_user_ids in user_ids:
+                user_id = row_user_ids[0]
+                tasks.append(asyncio.ensure_future(
+                    sync_plan(session, user_id, old_managed_micro_cycle_id, new_managed_micro_cycle_id)))
+
+        results = await asyncio.gather(*tasks)
+        for result in results:
+            print(f"Final result: {result}")
+
+
+if __name__ == '__main__':
+    start_time = time.time()
+    asyncio.run(sync_all_plans(user_ids_filename='test_user_ids.csv', plan_maps_filename='test_plan_maps.csv'))
+    # asyncio.run(sync_all_plans(user_ids_filename='user_ids.csv', plan_maps_filename='plan_maps.csv'))
+    print("--- %s seconds ---" % (time.time() - start_time))
