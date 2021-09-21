@@ -43,7 +43,7 @@ async def sync_all_plans(user_ids_filename, plan_maps_filename):
                 'newManagedMicrocycleId': new_managed_micro_cycle_id
             })
 
-    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=10)) as session:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=5)) as session:
         tasks = []
 
         for request_body in request_bodies:
@@ -54,6 +54,6 @@ async def sync_all_plans(user_ids_filename, plan_maps_filename):
 
 if __name__ == '__main__':
     start_time = time.time()
-    asyncio.run(sync_all_plans(user_ids_filename='test_user_ids.csv', plan_maps_filename='test_plan_maps.csv'))
-    # asyncio.run(sync_all_plans(user_ids_filename='user_ids.csv', plan_maps_filename='plan_maps.csv'))
+    # asyncio.run(sync_all_plans(user_ids_filename='test_user_ids.csv', plan_maps_filename='test_plan_maps.csv'))
+    asyncio.run(sync_all_plans(user_ids_filename='user_ids.csv', plan_maps_filename='plan_maps.csv'))
     print("--- %s seconds ---" % (time.time() - start_time))
