@@ -21,7 +21,7 @@ async def sync_plan(session, request_body):
 
     async with session.put(url, request_body) as res:
         status = await res.json()
-        return status
+        print(status)
 
 
 async def sync_all_plans(user_ids_filename, plan_maps_filename):
@@ -46,9 +46,7 @@ async def sync_all_plans(user_ids_filename, plan_maps_filename):
         for request_body in request_bodies:
             tasks.append(asyncio.ensure_future(sync_plan(session, request_body)))
 
-        results = await asyncio.gather(*tasks)
-        for result in results:
-            print(f"Final result: {result}")
+        await asyncio.gather(*tasks)
 
 
 if __name__ == '__main__':
