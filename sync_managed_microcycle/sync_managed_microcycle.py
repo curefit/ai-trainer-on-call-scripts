@@ -44,7 +44,7 @@ async def sync_all_plans(user_ids_filename, plan_maps_filename):
                 'newManagedMicrocycleId': new_managed_micro_cycle_id
             })
 
-    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=2)) as session:
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=5)) as session:
         tasks = []
 
         for request_body in request_bodies:
