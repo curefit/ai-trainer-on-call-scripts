@@ -23,7 +23,7 @@ async def sync_plan(session, request_body):
     headers = {'Content-type': 'application/json'}
 
     async with session.put(url, data=json.dumps(request_body), headers=headers) as res:
-        status = await res.json()
+        status = await res.text()
         print(status)
 
 
