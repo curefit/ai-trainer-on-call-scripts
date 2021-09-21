@@ -6,10 +6,7 @@ Utility scripts
 
 ## Change to project root
 - `cd ai-trainer-on-call-scripts`
-
-## Update master
-- `git pull`
-
-## Activate project python
+- `python3.7 -m venv venv`
 - `source venv/bin/activate`
-- Install dependencies after activating python using `pip install requests aiohttp`
+- `pip install requests aiohttp`
+- To deactivate venv environment - `deactivate`
