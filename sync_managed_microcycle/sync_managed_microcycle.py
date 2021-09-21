@@ -16,13 +16,8 @@ def get_plan_maps(plan_maps_filename):
     return plan_maps
 
 
-async def sync_plan(session, userId, old_managed_micro_cycle_id, new_managed_micro_cycle_id):
+async def sync_plan(session, request_body):
     url = "http://user-fitness-service.production.cure.fit.internal/sync/managed_microcycle_single_user"
-    request_body = {
-        'userId': userId,
-        'oldManagedMicrocycleId': old_managed_micro_cycle_id,
-        'newManagedMicrocycleId': new_managed_micro_cycle_id
-    }
 
     async with session.put(url, request_body) as res:
         status = await res.json()
@@ -30,19 +25,26 @@ async def sync_plan(session, userId, old_managed_micro_cycle_id, new_managed_mic
 
 
 async def sync_all_plans(user_ids_filename, plan_maps_filename):
-    user_ids = get_user_ids(user_ids_filename)
-    plan_maps = get_plan_maps(plan_maps_filename)
+    user_ids_rows = get_user_ids(user_ids_filename)
+    plan_maps_rows = get_plan_maps(plan_maps_filename)
 
-    async with aiohttp.ClientSession() as session:
+    request_bodies = []
+    for plan_maps_row in plan_maps_rows:
+        for user_ids_row in user_ids_rows:
+            old_managed_micro_cycle_id = plan_maps_row[0]
+            new_managed_micro_cycle_id = plan_maps_row[1]
+            user_id = user_ids_row[0]
+            request_bodies.append({
+                'userId': user_id,
+                'oldManagedMicrocycleId': old_managed_micro_cycle_id,
+                'newManagedMicrocycleId': new_managed_micro_cycle_id
+            })
+
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(limit=5)) as session:
         tasks = []
-        for row_plan_maps in plan_maps:
-            old_managed_micro_cycle_id = row_plan_maps[0]
-            new_managed_micro_cycle_id = row_plan_maps[1]
 
-            for row_user_ids in user_ids:
-                user_id = row_user_ids[0]
-                tasks.append(asyncio.ensure_future(
-                    sync_plan(session, user_id, old_managed_micro_cycle_id, new_managed_micro_cycle_id)))
+        for request_body in request_bodies:
+            tasks.append(asyncio.ensure_future(sync_plan(session, request_body)))
 
         results = await asyncio.gather(*tasks)
         for result in results:
