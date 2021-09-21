@@ -1,4 +1,6 @@
 import csv
+import json
+
 import aiohttp
 import asyncio
 import time
@@ -18,9 +20,9 @@ def get_plan_maps(plan_maps_filename):
 
 async def sync_plan(session, request_body):
     url = "http://user-fitness-service.production.cure.fit.internal/sync/managed_microcycle_single_user"
-    headers = {'content-type': 'application/json'}
+    headers = {'Content-type': 'application/json'}
 
-    async with session.put(url, data=request_body, headers = headers) as res:
+    async with session.put(url, data=json.dumps(request_body), headers=headers) as res:
         status = await res.json()
         print(status)
 
