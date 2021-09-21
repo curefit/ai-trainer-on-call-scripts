@@ -19,7 +19,7 @@ def get_plan_maps(plan_maps_filename):
 async def sync_plan(session, request_body):
     url = "http://user-fitness-service.production.cure.fit.internal/sync/managed_microcycle_single_user"
 
-    async with session.put(url, request_body) as res:
+    async with session.put(url, data=request_body) as res:
         status = await res.json()
         print(status)
 
